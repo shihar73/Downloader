@@ -1,0 +1,15 @@
+.main-img{
+    height: 15rem;
+}
+.main-img:hover{ 
+    height: 17rem;
+}
+
+@media screen and (max-width: 600px) {
+    .main-img{
+        height: 7rem;
+    }
+    .main-img:hover{ 
+        height: 8rem;
+    }
+  }
