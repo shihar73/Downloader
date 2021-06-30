@@ -1,4 +1,5 @@
 from flask import *
+import _thread
 from youtube import dw_YouTube
 import time
 import os
@@ -15,6 +16,13 @@ def index():
 
 @app.route("/youtube", methods=['GET', 'POST'])
 def youtube():
+    def delete_video(name, path):
+        # video_path = current_app.root_path + "/static/youtube_videos" + name +".mp4"
+        video_path = path+ "/" + name +".mp4"
+        time.sleep(500)
+        os.remove(video_path) 
+        print("deleted",video_path)
+
     if request.method == 'POST':
         url = request.form["url"]
         quality = request.form["quality"]
@@ -23,17 +31,17 @@ def youtube():
             name = url[-10:]
             youtube = dw_YouTube(url, quality, path)
             msg = youtube.download_video()
-            print(msg)
             if msg == "Error":
                 print('Download Error Pleas check URL')
                 flash('Download Error Pleas check URL', "err")
                 return redirect(url_for("youtube"))
             else : 
-                
+                _thread.start_new_thread( delete_video, (name, path) )
                 flash(name, "data")
                 return redirect("/youtube")
 
         else:
+            # _thread.start_new_thread( delete_video, ('name', ) )
             flash('Pleas check URL', "err")
             return redirect(url_for("youtube"))
   
