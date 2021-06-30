@@ -47,16 +47,15 @@
         {% if messages %}
 
         {% for message in messages %}
-        <h3>data {{ message }}</h3>
-        <a href="/static/youtube_videos/Nadiyon Paar - Full Song - Roohi  Janhvi Kapoor Sachin-Jigar  Shamur  Rashmeet K.mp4" download>
+        <h3 style="color: rgb(21, 88, 5)">Video Download Seccessfully</h3>
+        <a href="/static/youtube_videos/{{ message }}.mp4" download>
             <button type="button" class="btn btn-secondary">Download</button>
         </a>
         {% endfor %}
 
         {% endif %}
         {% endwith %}
-    
-        <a href="static/img/icon.jpeg"  class="btn btn-secondary" download="">Download</a>
+       
     
     </div>
 </div>

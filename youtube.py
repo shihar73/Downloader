@@ -3,15 +3,15 @@ from pytube import YouTube
 
 class dw_YouTube:
     err = None
-    def __init__(self, url, quality, name):
+    def __init__(self, url, quality, path):
         self.url = url
         self.quality = quality
-        self.name = name
+        self.path = path
 
 
 
     def download_video(self):
-        print(self.url, self.quality, self.name)
+        print(self.url, self.quality, self.path)
         try:
             choice = self.quality
             url = self.url
@@ -24,7 +24,7 @@ class dw_YouTube:
                 select = yt.streams.filter(only_audio=True).first()
 
             # download function
-            # select.download(self.name)
+            select.download(output_path=self.path, filename= url[-10:])
             self.msg = yt.title
             print("download seccess", self.msg)
             return self.msg

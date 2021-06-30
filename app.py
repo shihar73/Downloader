@@ -20,7 +20,7 @@ def youtube():
         quality = request.form["quality"]
         if (url[:23] == "https://www.youtube.com" or url[:16] == "https://youtu.be")  and len(url) > 23 :
             path = current_app.root_path + "/static/youtube_videos"
-
+            name = url[-10:]
             youtube = dw_YouTube(url, quality, path)
             msg = youtube.download_video()
             print(msg)
@@ -29,7 +29,8 @@ def youtube():
                 flash('Download Error Pleas check URL', "err")
                 return redirect(url_for("youtube"))
             else : 
-                flash(msg, "data")
+                
+                flash(name, "data")
                 return redirect("/youtube")
 
         else:
@@ -46,4 +47,4 @@ def insta():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
