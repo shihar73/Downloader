@@ -1,11 +1,65 @@
 {% extends 'base.html' %}
 
-{% block titil %}  Home {% endblock titil %}
+{% block titil %} Home {% endblock titil %}
 
 {% block index %}
 <div class="container mt-4 p-4">
-    <div class="row">
-       <h1>insta</h1>
+    <div class="row text-center ">
+        <form action="/insta" method="post">
+            <fieldset>
+                <legend>Enter Instagram Post URL</legend>
+                <div class="mb-3">
+                    <input type="url" id="disabledTextInput" class="form-control" placeholder="Disabled input" required
+                        name="url">
+                </div>
+                <div class="mb-3">
+                    <label for="disabledSelect" class="form-label">Disabled select menu</label>
+                    <select id="disabledSelect" class="form-select" required name="quality">
+                        <option value="0">Disabled select</option>
+                        <option value="1">high</option>
+                        <option value="2">low</option>
+                        <option value="3">audio onlly</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </fieldset>
+        </form>
     </div>
 </div>
+<div class="container mt-4 p-4">
+    <div class="row text-center">
+        {% with messages = get_flashed_messages(category_filter=["err"]) %}
+        {% if messages %}
+
+        {% for message in messages %}
+        <h3 style="color: rgb(214, 36, 36)">{{ message }}</h3>
+        {% endfor %}
+
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
+
+<div class="container mt-4 p-4">
+    <div class="row text-center">
+        {% with messages = get_flashed_messages(category_filter=["data"]) %}
+        {% if messages %}
+
+        {% for message in messages %}
+        <h3 style="color: rgb(21, 88, 5)">Video Download Seccessfully</h3>
+        <a href="/static/insta_videos/{{ message }}" download>
+            <button type="button" class="btn btn-secondary">Download</button>
+        </a>
+        {% endfor %}
+
+        {% endif %}
+        {% endwith %}
+       
+    
+    </div>
+</div>
+
+
+
 {% endblock index %}
