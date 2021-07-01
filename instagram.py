@@ -79,9 +79,9 @@ class DownloadInsta:
                 
                 return "success", self.name
         except:
-            print("Error: Didi't get download link")
+            print("Error: Didn't get download link")
             driver.quit()
-            return "error", "Error: Didi't get download link"
+            return "error", "Error: Didn't get download link"
 
 
     
