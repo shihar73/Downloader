@@ -1,95 +1,157 @@
-from selenium import webdriver
-import pickle5 as pickle
-from bs4 import BeautifulSoup
+import random
+import time
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
 import requests
-import urllib
-from urllib.parse import urlparse
-import json
-import insta_log
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
 
 
 class DownloadInsta:
-    def __init__(self, url, loc): 
+    def __init__(self,url,loc):
         self.url = url
         self.loc = loc
 
+        dotenv_path = join(dirname(__file__), '.env')
+        load_dotenv(dotenv_path)
 
-    def dw_vid(self, url, root):
+        self.username = os.environ.get("INSTA_USER_NAME")
+        self.password = os.environ.get("INSTA_PASS")
+        # instagram's video src doesn't work on PC normally. Video has 'blob:https://...' link format
+        # but using mobile emulator, link has normal form ('https://...')
+        mobile_emulation = {
+            "deviceName": "iPhone X"
+        }  # choose device to emulate
+
+        # define a variable to hold all the configurations we want
+        chrome_options = webdriver.ChromeOptions()
+
+        # add the mobile emulation to the chrome options variable
+        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+
+        # create driver, pass it the path to the chromedriver file and the special configurations you want to run
+        self.browser = webdriver.Chrome(
+            executable_path='chromedriver',
+            options=chrome_options)
+
+    def close_browser(self):
+        self.browser.close()  # close browser
+        self.browser.quit()  # (just in case)
+
+    def xpath_exists(self, url):
+        browser = self.browser
         try:
-            name = urlparse(url).path[-25:]
-            self.name = name
-            resource = urllib.request.urlopen(url)
+            browser.find_element_by_xpath(url)
+            exist = True
+        except NoSuchElementException:
+            exist = False
+        return exist
 
-            if root:
-                f_name = root + name
-            else:
-                f_name = name
+    def login(self,username, password):
 
-            output = open(f_name, "wb")
-            output.write(resource.read())
-            output.close
-            print(f_name, 'download successful')
-            return "successful"
-        except:
-            print("Error: Download Failed check url or location")
-            return "error"
-
-
-    def download(self):
         try:
-            PATH = "/usr/bin/chromedriver"
-            driver = webdriver.Chrome(PATH)
-            driver.get('https://www.instagram.com/')
-            try:
-                cookies = pickle.load(open("cookies.pkl", "rb"))
-                for cookie in cookies:
-                    driver.add_cookie(cookie)
-            except:
-                print("get cookies")
-                log = insta_log.cookies()
-                log.get_cookie()
-                cookies = pickle.load(open("cookies.pkl", "rb"))
-                for cookie in cookies:
-                    driver.add_cookie(cookie)
+            # self.username = username
+            # self.password = password
+            # open website
+            self.browser.get('https://www.instagram.com/accounts/login/?next=%2F&source=mobile_nav')
+            time.sleep(random.randrange(2, 4))
+            print(self.browser.title)
+            # find username input
+            user_input = self.browser.find_element_by_name('username')
+            # clear the field (just in case)
+            user_input.clear()
+            # write the username
+            user_input.send_keys(username)
 
-            driver.get(self.url)
-            soup = BeautifulSoup(driver.page_source, "html.parser")
+            time.sleep(random.randrange(2, 4))
+            # find password input
+            password_input = self.browser.find_element_by_name('password')
+            password_input.clear()
+            # write the password
+            password_input.send_keys(password)
+            
+            time.sleep(random.randrange(2, 4))
+            # send the complete authorization form
+            password_input.send_keys(Keys.ENTER)
+            time.sleep(5)
+        # if smth went wrong, close the browser
+        except Exception as ex:
+            print(ex)
+            self.close_browser()
 
-            main_data = json.loads(soup.find("body").text)
-            data = main_data['graphql']['shortcode_media']
+    def get_link(self, url):
+        if url[0:25] == "https://www.instagram.com":
+            url_1 = url.split("/")[-2]
+            print(url_1)
+            if len(url_1) >= 20:
+                print("Error: This is a privet account")
+                username = self.username
+                password = self.password
+                self.login(username, password)
+                return True
+            return True            
+        else:
+            print('Error: Check url')
+            return False
 
-            is_video = data['is_video']
+    def download_videos(self):
+        try:
+            post_url = self.url
+            # username = self.username
+            # password = self.password
+            # self.login(username, password)
 
-            if is_video:
-                dw_url = data['video_url']
-                msg = self.dw_vid(dw_url, self.loc)
-                driver.quit()
-                if msg == "error":
-                    print("Error: Download failed")
-                    return "error", "Error: Download failed"
+            self.browser.get(post_url)
+            print(self.browser.title)
+            time.sleep(4)
+            video_src = "/html/body/div[1]/section/main/div/div[1]/article/div[2]/div/div/div[1]/div/div/video"
 
+            if self.xpath_exists(video_src):
+                video_src_url = self.browser.find_element_by_xpath(video_src).get_attribute("src")
+
+                # save video
+                name_full = video_src_url.split("/")[-1]
+                self.name = name_full.split("?")[-2]
+                name = self.loc + self.name
+                video = requests.get(video_src_url, stream=True)
+                with open(f"{name}", "wb") as video_file:
+                    for chunk in video.iter_content(chunk_size=1024 * 1024):
+                        if chunk:
+                            video_file.write(chunk)
+
+                self.close_browser()
+                print(f"{self.name} successfully saved!")
                 return "success", self.name
             else:
-                dw_url = data['display_url']
-                msg =self.dw_vid(dw_url, self.loc)
-                driver.quit()
-                if msg == "error":
-                    print("Error: Download failed")
-                    return "error", "Error: Download failed"
+                print('Error: There is no video')
+                    
+                self.close_browser()
+                return "error", "Error: Didn't get download link"
                 
-                return "success", self.name
-        except:
-            print("Error: Didn't get download link")
-            driver.quit()
+
+            
+            
+        except Exception as ex:
+            print(ex)
+            self.close_browser()
             return "error", "Error: Didn't get download link"
 
 
-    
+
 def main():
-    loc =str(input("Enter location (Default : /root/Downloads/): "))
     url = str(input("Enter url : "))
-    dw = DownloadInsta(url, loc)
-    dw.download()
+    parser = DownloadInsta()
+    parser.download_videos(url)
+
 
 if __name__ == "__main__":
     main()
+
+
+

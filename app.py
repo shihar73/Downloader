@@ -62,16 +62,15 @@ def insta():
         url = request.form["url"]
         if url[0:25] == "https://www.instagram.com":
             url_1 = urllib.parse.urlparse(url)
-            if len(url_1.path) >= 30:
+            if len(url_1.path) >= 20:
                 print("This is a privet account")
                 flash('This is a privet account', "err")
                 return redirect(url_for("insta"))
             else:
-                url = "https://www.instagram.com"+url_1.path+"?__a=1"
                 path = current_app.root_path + "/static/insta_videos/"
                 print(url,path)
                 insta = DownloadInsta(url, path)
-                msg, data =insta.download()
+                msg, data =insta.download_videos()
                 if msg == "error":
                     print(data)
                     flash(data, "err")
