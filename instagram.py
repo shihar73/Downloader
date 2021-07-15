@@ -31,13 +31,17 @@ class DownloadInsta:
 
         # add the mobile emulation to the chrome options variable
         chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
-
+        chrome_options.binary_location = "/usr/bin/google-chrome"
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
 
         # create driver, pass it the path to the chromedriver file and the special configurations you want to run
+        path = join(dirname(__file__), 'chromedriver')
+        print(path)
         self.browser = webdriver.Chrome(
-            executable_path='chromedriver',
+            executable_path=path,
             options=chrome_options)
 
     def close_browser(self):
@@ -103,11 +107,13 @@ class DownloadInsta:
     def download_videos(self):
         try:
             post_url = self.url
-            username = self.username
-            password = self.password
-            self.login(username, password)
-
             self.browser.get(post_url)
+            if self.browser.title == "Login • Instagram":
+                username = self.username
+                password = self.password
+                self.login(username, password)
+                self.browser.get(post_url)
+
             print(self.browser.title)
             time.sleep(4)
             video_src = "/html/body/div[1]/section/main/div/div[1]/article/div[2]/div/div/div[1]/div/div/video"

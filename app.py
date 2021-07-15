@@ -21,7 +21,7 @@ def youtube():
     def delete_video(name, path):
         # video_path = current_app.root_path + "/static/youtube_videos" + name +".mp4"
         video_path = path+ "/" + name +".mp4"
-        time.sleep(30)
+        time.sleep(50)
         os.remove(video_path) 
         print("deleted",video_path)
 
@@ -54,7 +54,7 @@ def youtube():
 def insta():
     def delete_video(name, path):
         video_path = path + name
-        time.sleep(30)
+        time.sleep(50)
         os.remove(video_path) 
         print("deleted",video_path)
 
