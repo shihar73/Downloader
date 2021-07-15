@@ -1,10 +1,10 @@
+from flask import *
 import random
 import time
 import os
+import requests
 from os.path import join, dirname
 from dotenv import load_dotenv
-
-import requests
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -118,9 +118,11 @@ class DownloadInsta:
                 # save video
                 name_full = video_src_url.split("/")[-1]
                 self.name = name_full.split("?")[-2]
-                name = self.loc + self.name
+                print(self.loc)
                 video = requests.get(video_src_url, stream=True)
-                with open(f"{name}", "wb") as video_file:
+                name = current_app.root_path + "/static/insta_videos/" + self.name
+                print(name)
+                with open(name, "wb") as video_file:
                     for chunk in video.iter_content(chunk_size=1024 * 1024):
                         if chunk:
                             video_file.write(chunk)
