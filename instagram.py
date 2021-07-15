@@ -103,9 +103,9 @@ class DownloadInsta:
     def download_videos(self):
         try:
             post_url = self.url
-            # username = self.username
-            # password = self.password
-            # self.login(username, password)
+            username = self.username
+            password = self.password
+            self.login(username, password)
 
             self.browser.get(post_url)
             print(self.browser.title)
