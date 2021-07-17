@@ -21,8 +21,10 @@ class DownloadInsta:
 
         self.username = os.environ.get("INSTA_USER_NAME")
         self.password = os.environ.get("INSTA_PASS")
+        
         # instagram's video src doesn't work on PC normally. Video has 'blob:https://...' link format
         # but using mobile emulator, link has normal form ('https://...')
+
         mobile_emulation = {
             "deviceName": "iPhone X"
         }  # choose device to emulate
