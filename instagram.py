@@ -10,6 +10,9 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 
+os.environ['CHROMEDRIVER_PATH'] = '/usr/bin/chromedriver'
+os.environ['GOOGLE_CHROME_BIN'] = '/usr/bin/google-chrome'
+
 class DownloadInsta:
     def __init__(self,url,loc):
         self.url = url
@@ -31,17 +34,18 @@ class DownloadInsta:
 
         # add the mobile emulation to the chrome options variable
         chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
-        chrome_options.binary_location = "/usr/bin/google-chrome"
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")
+        
 
         # create driver, pass it the path to the chromedriver file and the special configurations you want to run
-        path = join(dirname(__file__), 'chromedriver')
-        print(path)
+        # path = join(dirname(__file__), 'chromedriver')
+        print(os.environ.get("CHROMEDRIVER_PATH"))
         self.browser = webdriver.Chrome(
-            executable_path=path,
+            executable_path=os.environ.get("CHROMEDRIVER_PATH"),
             options=chrome_options)
 
     def close_browser(self):
