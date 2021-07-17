@@ -10,8 +10,6 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 
-os.environ['CHROMEDRIVER_PATH'] = '/usr/bin/chromedriver'
-os.environ['GOOGLE_CHROME_BIN'] = '/usr/bin/google-chrome'
 
 class DownloadInsta:
     def __init__(self,url,loc):
