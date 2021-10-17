@@ -95,7 +95,7 @@ class DownloadInsta:
 
     def get_link(self, url):
         if url[0:25] == "https://www.instagram.com":
-            url_1 = url.split("/")[-2]
+            url_1 = url.split("/")
             print(url_1)
             if len(url_1) >= 20:
                 print("Error: This is a privet account")
@@ -113,6 +113,13 @@ class DownloadInsta:
             post_url = self.url
             self.browser.get(post_url)
             if self.browser.title == "Login • Instagram":
+                print('dfvdsfgd')
+                username = self.username
+                password = self.password
+                self.login(username, password)
+                self.browser.get(post_url)
+            
+            if self.browser.title == "Log in • Instagram":
                 username = self.username
                 password = self.password
                 self.login(username, password)
@@ -120,17 +127,20 @@ class DownloadInsta:
 
             print(self.browser.title)
             time.sleep(4)
-            video_src = "/html/body/div[1]/section/main/div/div[1]/article/div[2]/div/div/div[1]/div/div/video"
+            video_src = "/html/body/div[1]/section/main/div/div[1]/article/div/div[2]/div/div/div[1]/div/div/video"
 
             if self.xpath_exists(video_src):
                 video_src_url = self.browser.find_element_by_xpath(video_src).get_attribute("src")
+                print(video_src_url)
 
                 # save video
                 name_full = video_src_url.split("/")[-1]
                 self.name = name_full.split("?")[-2]
                 print(self.loc)
                 video = requests.get(video_src_url, stream=True)
+                print(name_full,"\n",self.name)
                 name = current_app.root_path + "/static/insta_videos/" + self.name
+
                 print(name)
                 with open(name, "wb") as video_file:
                     for chunk in video.iter_content(chunk_size=1024 * 1024):
@@ -158,8 +168,9 @@ class DownloadInsta:
 
 def main():
     url = str(input("Enter url : "))
-    parser = DownloadInsta()
-    parser.download_videos(url)
+    parser = DownloadInsta(url,'/root/Downloads/')
+    parser.get_link(url)
+    parser.download_videos()
 
 
 if __name__ == "__main__":
